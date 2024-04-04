@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-database.js"></script>
+    <title>Udarax.me Post 02</title>
+    <style>
+        .content{
+            padding: 50px;
+        }
+        .addsection , .viewSection{
+            margin-top: 50px;
+        }
+    </style>
+  </head>
+  <body>
+        <div class="container">
+            <div class="content">
+                <h3>Read and Write Data with JavaScript</h3>
+                <div class="addsection">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label for="">Nome</label>
+                                <input type="text" name="Nome" id="name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label for="">Descrição</label>
+                                <input type="text" name="Descrição" id="desc" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="">Link</label>
+                                <input type="text" name="Link" id="link" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label for="">Adicionar</label>
+                                <input type="button" name="addButon" id="addButon" class="btn btn-success col-lg-12" value="Add">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="viewSection">
+                    <table class="table" id="userTable">
+                        <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Link</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-analytics.js";
+        </script>
+        <script src="index.js"></script>
+        <script>
+             function resetInputs(){
+                $("#name").val("");
+                $("#desc").val("");
+                $("#link").val("");
+                
+            }
+            uid = sessionStorage.getItem('TokenUSER');
+            var ref = firebase.database().ref('/users/' + uid + "/links")
+            console.log(ref)
+            ref.on("value", function (snapshot) {
+                var result = [];
+                let arr = [];
+                const data = snapshot.val();
+                console.log(data)
+                arr.push(data);
+                $("#userTable").find("tr:gt(0)").remove();
+                console.log("This");
+                console.log(result);
+                console.log(arr.length-1);
+                for(var i in arr[0]){
+                    result.push([i, arr[0][i]]);
+                }
+                console.log(result);
+                for (i = 0; i <result.length; i++) { 
+                    let user_id = String(result[i][0]);
+                    console.log(result[i][1]['name'])
+                    markup = "<tr class='trow'><td>" + 
+                    result[i][1]['name'] + "</td><td>" +
+                    result[i][1]['desc'] + "</td><td>" +
+                    result[i][1]['link'] + "</td></tr>" 
+                    tableBody = $("#userTable tbody");
+                    tableBody.append(markup);
+                }
+            }, function (error) {
+                console.log("Error: " + error.code);
+            });
+           
+            function deleteUser(id){
+                console.log(id);
+            }
+          
+            $("#addButon").click(function (){
+                console.log("Clicked");
+                $("#userTable").find("tr:gt(0)").remove();
+                let name = $("#name").val();
+                let desc = $("#desc").val();
+                let link = $("#link").val();
+                console.log('/users/' + uid + "/links" + "/" + name)
+                if (uid != null){
+                    firebase.database().ref('/users/' + uid + "/links" + "/" + name).set({ 
+                        name: name,
+                        desc: desc,
+                        link : link
+                });
+                } else{alert("Autenticação necessária")}
+                resetInputs();
+            });
+            
+        </script>
+  </body>
+</html>
