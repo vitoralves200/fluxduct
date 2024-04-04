@@ -44,7 +44,6 @@ function register () {
     // Create User data
     var user_data = {
       email : email,
-      full_name : full_name,
     }
 
     // Push to Firebase Database
